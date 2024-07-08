@@ -1,0 +1,111 @@
+{
+  "inputs": [
+    {
+      "components": [
+        {
+          "internalType": "address",
+          "name": "srcToken",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint64",
+          "name": "dstChainId",
+          "type": "uint64"
+        },
+        {
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "plexusData",
+          "type": "bytes"
+        }
+      ],
+      "internalType": "struct IBridge.BridgeData",
+      "name": "_bridgeData",
+      "type": "tuple"
+    },
+    {
+      "components": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "swapAdapter",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "tokenOut",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "minAmountOut",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "deadline",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes",
+              "name": "rawParams",
+              "type": "bytes"
+            }
+          ],
+          "internalType": "struct SwapQuery",
+          "name": "originQuery",
+          "type": "tuple"
+        },
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "swapAdapter",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "tokenOut",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "minAmountOut",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "deadline",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes",
+              "name": "rawParams",
+              "type": "bytes"
+            }
+          ],
+          "internalType": "struct SwapQuery",
+          "name": "destQuery",
+          "type": "tuple"
+        }
+      ],
+      "internalType": "struct SynapseData",
+      "name": "_synapseDesc",
+      "type": "tuple"
+    }
+  ],
+  "name": "bridgeToSynapse",
+  "outputs": [],
+  "stateMutability": "payable",
+  "type": "function"
+}

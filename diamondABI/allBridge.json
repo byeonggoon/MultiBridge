@@ -1,0 +1,62 @@
+{
+  "inputs": [
+    {
+      "components": [
+        {
+          "internalType": "address",
+          "name": "srcToken",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint64",
+          "name": "dstChainId",
+          "type": "uint64"
+        },
+        {
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "plexusData",
+          "type": "bytes"
+        }
+      ],
+      "internalType": "struct IBridge.BridgeData",
+      "name": "_bridgeData",
+      "type": "tuple"
+    },
+    {
+      "components": [
+        {
+          "internalType": "uint256",
+          "name": "nonce",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "receiveToken",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "feeTokenAmount",
+          "type": "uint256"
+        }
+      ],
+      "internalType": "struct AllBridgeData",
+      "name": "_allBridgeData",
+      "type": "tuple"
+    }
+  ],
+  "name": "bridgeToAllbridge",
+  "outputs": [],
+  "stateMutability": "payable",
+  "type": "function"
+}

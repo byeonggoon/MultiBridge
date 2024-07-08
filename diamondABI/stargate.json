@@ -1,0 +1,60 @@
+{
+  "inputs": [
+    {
+      "components": [
+        {
+          "internalType": "address",
+          "name": "srcToken",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "dstPoolId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "dstChainId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "receiver",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "minAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "fee",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "payload",
+          "type": "bytes"
+        },
+        {
+          "internalType": "bytes",
+          "name": "plexusData",
+          "type": "bytes"
+        }
+      ],
+      "internalType": "struct StargateDescription",
+      "name": "sDesc",
+      "type": "tuple"
+    }
+  ],
+  "name": "bridgeToStargate",
+  "outputs": [],
+  "stateMutability": "payable",
+  "type": "function"
+}

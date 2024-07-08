@@ -1,0 +1,62 @@
+{
+  "inputs": [
+    {
+      "components": [
+        {
+          "internalType": "address",
+          "name": "srcToken",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint64",
+          "name": "dstChainId",
+          "type": "uint64"
+        },
+        {
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "plexusData",
+          "type": "bytes"
+        }
+      ],
+      "internalType": "struct IBridge.BridgeData",
+      "name": "_bridgeData",
+      "type": "tuple"
+    },
+    {
+      "components": [
+        {
+          "internalType": "address",
+          "name": "toChainToken",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "aggregatorAdaptor",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "referrer",
+          "type": "address"
+        }
+      ],
+      "internalType": "struct XyBridgeData",
+      "name": "_xyDesc",
+      "type": "tuple"
+    }
+  ],
+  "name": "bridgeToXybridge",
+  "outputs": [],
+  "stateMutability": "payable",
+  "type": "function"
+}
