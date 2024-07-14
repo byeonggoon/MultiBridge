@@ -1,15 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "./helpers/ReentrancyGuard.sol";
-import "./interfaces/IThetaV2.sol";
+import "./interfaces/IMultiBridgeV2.sol";
 import "./interfaces/IFixtool.sol";
 import "./libraries/SafeERC20.sol";
 
-contract ThetaV2 is Initializable, UUPSUpgradeable, OwnableUpgradeable, ReentrancyGuard {
+contract MultiBridge is Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     address private constant NATIVE_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
@@ -29,18 +27,12 @@ contract ThetaV2 is Initializable, UUPSUpgradeable, OwnableUpgradeable, Reentran
     error MUST_ALLOWED();
     error MORE_VALUE();
     error NOT_CORRECT_RATE();
-    error THETA_V2_FAILED();
+    error MultiBridge_V2_FAILED();
     error MISSMATCH();
 
-    event WholeTheta(address user, OutputToken[] indexed srcToken, uint256[] fromAmount, string bridge);
+    event WholeMultiBridge(address user, OutputToken[] indexed srcToken, uint256[] fromAmount, string bridge);
 
-    function initialize(address _router) public initializer {
-        __Ownable_init(msg.sender);
-        __UUPSUpgradeable_init();
-        ROUTER = _router;
-    }
-
-    function _authorizeUpgrade(address) internal override onlyOwner {}
+    constructor()Ownable(msg.sender){}
 
     //setter
     function setSelector(bytes4[] calldata _selector, address[] calldata _selectorAddr) external onlyOwner {
@@ -99,23 +91,23 @@ contract ThetaV2 is Initializable, UUPSUpgradeable, OwnableUpgradeable, Reentran
     }
 
     // Bridge
-    function thetaV2BridgeCall(ThetaValue[] memory thetas) public payable {
-        for (uint256 i = 0; i < thetas.length; ) {
-            SelectorCheck memory selectorCheck = functionSelectInfo[bytes4(thetas[i].callData)];
+    function multibridgeV2BridgeCall(MultibridgeValue[] memory multibridges) public payable {
+        for (uint256 i = 0; i < multibridges.length; ) {
+            SelectorCheck memory selectorCheck = functionSelectInfo[bytes4(multibridges[i].callData)];
             if (selectorCheck.check == false) revert NotSupported();
-            (address srcToken, uint256 amount) = IFixtool(selectorCheck.selectorAddr).getBridgeTokenAndAmount(thetas[i].callData);
+            (address srcToken, uint256 amount) = IFixtool(selectorCheck.selectorAddr).getBridgeTokenAndAmount(multibridges[i].callData);
             _approveRouter(srcToken, amount);
             unchecked {
                 ++i;
             }
         }
-        _thetaV2Call(thetas);
+        _multibridgeV2Call(multibridges);
     }
 
     //swap + Bridge
     //eachBridgeTotalRate total sum is 100.
 
-    function swapThetaV2Call(SwapData calldata _swap, ThetaValue[] memory thetas, SplitData memory splitData) public payable nonReentrant {
+    function swapMultibridgeV2Call(SwapData calldata _swap, MultibridgeValue[] memory multibridges, SplitData memory splitData) public payable nonReentrant {
         _isSwapTokenDeposit(_swap.input);
 
         uint256[] memory _bridgeAmount = _bridgeSwapStart(_swap);
@@ -145,24 +137,24 @@ contract ThetaV2 is Initializable, UUPSUpgradeable, OwnableUpgradeable, Reentran
                 ++i;
             }
         }
-        emit WholeTheta(msg.sender, _swap.output, _bridgeAmount, "THETAV2");
+        emit WholeMultiBridge(msg.sender, _swap.output, _bridgeAmount, "MULTIV2");
 
         if (_outputLength == 1) {
             uint256 totalRate;
             //single Token Multi Bridge
             // 1. oneToken - multi bridge - NO MORE SPLIT
             for (uint256 i = 0; i < splitData.splitRate[0].length; ) {
-                SelectorCheck memory selectorCheck = functionSelectInfo[bytes4(thetas[i].callData)];
+                SelectorCheck memory selectorCheck = functionSelectInfo[bytes4(multibridges[i].callData)];
                 if (selectorCheck.check == false) revert NotSupported();
 
                 bytes memory newData = IFixtool(selectorCheck.selectorAddr).fixAmountBridgeData(
-                    thetas[i].callData,
+                    multibridges[i].callData,
                     (_bridgeAmount[0] * splitData.splitRate[0][i]) / 100
                 );
-                thetas[i].callData = newData;
+                multibridges[i].callData = newData;
 
                 if (_swap.output[0].dstToken == NATIVE_ADDRESS) {
-                    thetas[i].value = (_bridgeAmount[0] * splitData.splitRate[0][i]) / 100;
+                    multibridges[i].value = (_bridgeAmount[0] * splitData.splitRate[0][i]) / 100;
                 }
 
                 unchecked {
@@ -175,13 +167,13 @@ contract ThetaV2 is Initializable, UUPSUpgradeable, OwnableUpgradeable, Reentran
             //multi Token Multi Bridge
             //1.swap - multi Token -  multi bridge - NO MORE SPLIT
             if (splitData.multiStandard == true) {
-                for (uint256 i = 0; i < thetas.length; ) {
-                    SelectorCheck memory selectorCheck = functionSelectInfo[bytes4(thetas[i].callData)];
+                for (uint256 i = 0; i < multibridges.length; ) {
+                    SelectorCheck memory selectorCheck = functionSelectInfo[bytes4(multibridges[i].callData)];
                     if (selectorCheck.check == false) revert NotSupported();
-                    bytes memory newData = IFixtool(selectorCheck.selectorAddr).fixAmountBridgeData(thetas[i].callData, _bridgeAmount[i]);
-                    thetas[i].callData = newData;
+                    bytes memory newData = IFixtool(selectorCheck.selectorAddr).fixAmountBridgeData(multibridges[i].callData, _bridgeAmount[i]);
+                    multibridges[i].callData = newData;
                     if (_swap.output[i].dstToken == NATIVE_ADDRESS) {
-                        thetas[i].value = _bridgeAmount[i];
+                        multibridges[i].value = _bridgeAmount[i];
                     }
 
                     unchecked {
@@ -190,19 +182,19 @@ contract ThetaV2 is Initializable, UUPSUpgradeable, OwnableUpgradeable, Reentran
                 }
             } else if (splitData.multiStandard == false) {
                 //2. swap -  multi bridge -  SPLIT
-                uint256 thetaIndex = 0;
+                uint256 multibridgeIndex = 0;
                 for (uint256 i = 0; i < splitData.splitRate.length; i++) {
                     uint256[] memory currentSplitRates = splitData.splitRate[i];
                     uint256 totalRate = 0;
                     for (uint256 j = 0; j < currentSplitRates.length; ) {
-                        SelectorCheck memory selectorCheck = functionSelectInfo[bytes4(thetas[thetaIndex].callData)];
+                        SelectorCheck memory selectorCheck = functionSelectInfo[bytes4(multibridges[multibridgeIndex].callData)];
                         uint256 newAmount = (_bridgeAmount[i] * currentSplitRates[j]) / 100;
                         if (_swap.output[i].dstToken == NATIVE_ADDRESS) {
-                            thetas[thetaIndex].value = newAmount;
+                            multibridges[multibridgeIndex].value = newAmount;
                         }
-                        bytes memory newData = IFixtool(selectorCheck.selectorAddr).fixAmountBridgeData(thetas[thetaIndex].callData, newAmount);
-                        thetas[thetaIndex].callData = newData;
-                        thetaIndex++;
+                        bytes memory newData = IFixtool(selectorCheck.selectorAddr).fixAmountBridgeData(multibridges[multibridgeIndex].callData, newAmount);
+                        multibridges[multibridgeIndex].callData = newData;
+                        multibridgeIndex++;
                         totalRate += currentSplitRates[j];
                         unchecked {
                             ++j;
@@ -210,16 +202,16 @@ contract ThetaV2 is Initializable, UUPSUpgradeable, OwnableUpgradeable, Reentran
                     }
                     if (totalRate != 100) revert NOT_CORRECT_RATE();
                 }
-                if (thetaIndex != thetas.length) revert MISSMATCH();
+                if (multibridgeIndex != multibridges.length) revert MISSMATCH();
             }
         }
 
-        _thetaV2Call(thetas);
+        _multibridgeV2Call(multibridges);
     }
 
-    function _thetaV2Call(ThetaValue[] memory thetas) internal {
-        for (uint256 i = 0; i < thetas.length; ) {
-            (bool success, bytes memory result) = ROUTER.call{value: thetas[i].value}(thetas[i].callData);
+    function _multibridgeV2Call(MultibridgeValue[] memory multibridges) internal {
+        for (uint256 i = 0; i < multibridges.length; ) {
+            (bool success, bytes memory result) = ROUTER.call{value: multibridges[i].value}(multibridges[i].callData);
             if (!success) {
                 _revertWithError(result);
             }

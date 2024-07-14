@@ -33,14 +33,14 @@ struct BridgeData {
     bytes plexusData;
 }
 
-struct ThetaValue {
+struct MultibridgeValue {
     uint256 value;
     bytes callData;
 }
 
 struct SplitData {
     uint256[][] splitRate; // [[100],[20,40,40],[100]] splitRate.length max 3
-    bool multiStandard; // swapThetaV2Call,thetaV2BridgeCall default is true,
+    bool multiStandard; // swapMultiBridgeV2Call,multiV2BridgeCall default is true,
 }
 
 struct Result {
